@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { MongoClient, ServerApiVersion } from 'mongodb'
-import env from './environment.js'
+import { env } from './environment.js'
 
 const MONGODB_URI = env.MONGODB_URI || 'mongodb://localhost:27017'
 const DATABASE_NAME = env.DATABASE_NAME || 'myDatabase'
