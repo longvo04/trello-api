@@ -1,26 +1,33 @@
+/* eslint-disable no-console */
 import express from 'express'
-import { mapOrder } from '~/utils/sorts.js'
+import { CONNECT_DB, CLOSE_DB } from './config/mongodb'
+import exitHook from 'async-exit-hook'
+import env from './config/environment.js'
+import { APIs_V1 } from './routes/v1/index.js'
 
 const app = express()
 
-const hostname = 'localhost'
-const port = 8017
+const hostname = env.APP_HOST
+const port = env.APP_PORT
 
-app.get('/', (req, res) => {
-  // Test Absolute import mapOrder
-  console.log(mapOrder(
-    [ { id: 'id-1', name: 'One' },
-      { id: 'id-2', name: 'Two' },
-      { id: 'id-3', name: 'Three' },
-      { id: 'id-4', name: 'Four' },
-      { id: 'id-5', name: 'Five' } ],
-    ['id-5', 'id-4', 'id-2', 'id-3', 'id-1'],
-    'id'
-  ))
-  res.end('<h1>Hello World!</h1><hr>')
-})
+const START_SERVER = () => {
+  app.use('/v1', APIs_V1)
+  app.listen(port, hostname, () => {
+    // eslint-disable-next-line no-console
+    console.log(`Server is running at http://${ hostname }:${ port }/`)
+  })
 
-app.listen(port, hostname, () => {
-  // eslint-disable-next-line no-console
-  console.log(`Server is running at http://${ hostname }:${ port }/`)
-})
+  exitHook(() => CLOSE_DB())
+}
+
+(async () => {
+  try {
+    console.log('Connecting to MongoDB...')
+    await CONNECT_DB()
+    console.log('Connected to MongoDB successfully.')
+    START_SERVER()
+  } catch (error) {
+    console.error('Failed to connect to MongoDB:', error)
+    process.exit(1)
+  }
+})()
