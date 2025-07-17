@@ -16,8 +16,7 @@ const createNew = async (req, res, next) => {
   try {
     // console.log('Validating request body:', req.body)
     await schema.validateAsync(req.body, { abortEarly: false })
-    // next()
-    res.status(StatusCodes.CREATED).json({ message: 'Board created successfully' })
+    next()
   } catch (error) {
     // console.log(error)
     res.status(StatusCodes.UNPROCESSABLE_ENTITY).json({
