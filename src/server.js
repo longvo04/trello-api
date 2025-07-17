@@ -11,6 +11,8 @@ const hostname = env.APP_HOST
 const port = env.APP_PORT
 
 const START_SERVER = () => {
+
+  app.use(express.json())
   app.use('/v1', APIs_V1)
   app.listen(port, hostname, () => {
     // eslint-disable-next-line no-console
