@@ -5,13 +5,15 @@ import exitHook from 'async-exit-hook'
 import { env } from './config/environment.js'
 import { APIs_V1 } from './routes/v1/index.js'
 import { errorHandlingMiddleware } from './middlewares/errorHandlingMiddleware.js'
+import cors from 'cors'
+import { corsOptions } from './config/cors'
 const app = express()
 
 const hostname = env.APP_HOST
 const port = env.APP_PORT
 
 const START_SERVER = () => {
-
+  app.use(cors(corsOptions))
   app.use(express.json())
   app.use('/v1', APIs_V1)
   app.use(errorHandlingMiddleware)
