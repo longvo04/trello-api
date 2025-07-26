@@ -1,6 +1,8 @@
 /* eslint-disable no-useless-catch */
 import { slugify } from '~/utils/formatters'
 import { boardModel } from '~/models/boardModel'
+import { cloneDeep } from 'lodash'
+import ApiError from '~/utils/ApiError'
 
 const createNew = async (board) => {
   try {
@@ -16,7 +18,17 @@ const createNew = async (board) => {
 }
 const getDetails = async (boardId) => {
   try {
-    return await boardModel.getDetails(boardId)
+    const board = await boardModel.getDetails(boardId)
+    if (!board) {
+      throw new ApiError(404, 'Board not found')
+    }
+    const result = cloneDeep(board)
+    result.columns = result.columns.map(column => {
+      column.cards = board.cards.filter(card => card.columnId.toString() === column._id.toString())
+      return column
+    })
+    delete result.cards
+    return result
   } catch (error) { throw error }
 
 }

@@ -1,6 +1,7 @@
 import Joi from 'joi'
 import { StatusCodes } from 'http-status-codes'
 import ApiError from '~/utils/ApiError'
+import { BOARD_TYPES } from '~/utils/constants'
 
 const createNew = async (req, res, next) => {
   const schema = Joi.object({
@@ -11,7 +12,8 @@ const createNew = async (req, res, next) => {
       'string.min': 'Title must be at least 3 characters long',
       'string.max': 'Title must not exceed 100 characters'
     }),
-    description: Joi.string().required().min(3).max(500).trim().strict()
+    description: Joi.string().required().min(3).max(500).trim().strict(),
+    type: Joi.string().valid(BOARD_TYPES.PUBLIC, BOARD_TYPES.PRIVATE).required()
   })
 
   try {
