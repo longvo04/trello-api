@@ -14,8 +14,8 @@ const createNew = async (board) => {
     const result = await boardModel.findOneById(createdBoard.insertedId)
     return result
   } catch (error) { throw error }
-
 }
+
 const getDetails = async (boardId) => {
   try {
     const board = await boardModel.getDetails(boardId)
@@ -30,10 +30,25 @@ const getDetails = async (boardId) => {
     delete result.cards
     return result
   } catch (error) { throw error }
+}
 
+
+const update = async (boardId, reqBody) => {
+  try {
+    const updateData = {
+      ...reqBody,
+      updatedAt: Date.now()
+    }
+    const updatedBoard = await boardModel.update(boardId, updateData)
+    if (!updatedBoard) {
+      throw new ApiError(404, 'Board not found')
+    }
+    return updatedBoard
+  } catch (error) { throw error }
 }
 
 export const boardService = {
   createNew,
-  getDetails
+  getDetails,
+  update
 }

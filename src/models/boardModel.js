@@ -22,6 +22,8 @@ const BOARD_COLLECTION_SCHEMA = Joi.object({
   _destroy: Joi.boolean().default(false)
 })
 
+const INVALID_UPDATE_FIELDS = ['_id', 'createdAt']
+
 const validateBeforeInsert = async (data) => {
   try {
     return await BOARD_COLLECTION_SCHEMA.validateAsync(data, { abortEarly: false })
@@ -92,11 +94,36 @@ const pushColumnIdToBoard = async (column) => {
   }
 }
 
+
+const update = async (boardId, updateData) => {
+  try {
+    // Validate updateData to ensure it does not contain invalid fields
+    Object.keys(updateData).forEach(fieldName => {
+      if (INVALID_UPDATE_FIELDS.includes(fieldName)) {
+        delete updateData[fieldName]
+      }
+    })
+    if (!boardId) {
+      throw new Error('Board ID is required')
+    }
+    const updatedBoard = await GET_DB().collection(BOARD_COLLECTION_NAME).findOneAndUpdate(
+      { _id: new ObjectId(String(boardId)) },
+      { $set: updateData },
+      { returnDocument: 'after' }
+    )
+
+    return updatedBoard
+  } catch (error) {
+    throw new Error(`Failed to push column ID to board: ${error.message}`)
+  }
+}
+
 export const boardModel = {
   BOARD_COLLECTION_NAME,
   BOARD_COLLECTION_SCHEMA,
   createNew,
   findOneById,
   getDetails,
-  pushColumnIdToBoard
+  pushColumnIdToBoard,
+  update
 }
