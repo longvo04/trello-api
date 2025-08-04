@@ -18,6 +18,8 @@ const COLUMN_COLLECTION_SCHEMA = Joi.object({
   _destroy: Joi.boolean().default(false)
 })
 
+const INVALID_UPDATE_FIELDS = ['_id', 'createdAt', 'boardId']
+
 const validateBeforeInsert = async (data) => {
   try {
     return await COLUMN_COLLECTION_SCHEMA.validateAsync(data, { abortEarly: false })
@@ -64,10 +66,37 @@ const pushCardIdToColumn = async (card) => {
   }
 }
 
+const update = async (columnId, updateData) => {
+  try {
+    // Validate updateData to ensure it does not contain invalid fields
+    Object.keys(updateData).forEach(fieldName => {
+      if (INVALID_UPDATE_FIELDS.includes(fieldName)) {
+        delete updateData[fieldName]
+      }
+      if (fieldName === 'cardOrderIds') {
+        updateData.cardOrderIds = updateData.cardOrderIds.map(id => new ObjectId(String(id)))
+      }
+    })
+    if (!columnId) {
+      throw new Error('Column ID is required')
+    }
+    const updatedColumn = await GET_DB().collection(COLUMN_COLLECTION_NAME).findOneAndUpdate(
+      { _id: new ObjectId(String(columnId)) },
+      { $set: updateData },
+      { returnDocument: 'after' }
+    )
+
+    return updatedColumn
+  } catch (error) {
+    throw new Error(`Failed to update column: ${error.message}`)
+  }
+}
+
 export const columnModel = {
   COLUMN_COLLECTION_NAME,
   COLUMN_COLLECTION_SCHEMA,
   createNew,
   findOneById,
-  pushCardIdToColumn
+  pushCardIdToColumn,
+  update
 }

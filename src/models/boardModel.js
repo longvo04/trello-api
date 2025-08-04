@@ -102,6 +102,9 @@ const update = async (boardId, updateData) => {
       if (INVALID_UPDATE_FIELDS.includes(fieldName)) {
         delete updateData[fieldName]
       }
+      if (fieldName === 'columnOrderIds') {
+        updateData.columnOrderIds = updateData.columnOrderIds.map(id => new ObjectId(String(id)))
+      }
     })
     if (!boardId) {
       throw new Error('Board ID is required')
@@ -114,7 +117,7 @@ const update = async (boardId, updateData) => {
 
     return updatedBoard
   } catch (error) {
-    throw new Error(`Failed to push column ID to board: ${error.message}`)
+    throw new Error(`Failed to update board: ${error.message}`)
   }
 }
 

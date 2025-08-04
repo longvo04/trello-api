@@ -1,6 +1,8 @@
 /* eslint-disable no-useless-catch */
 import { slugify } from '~/utils/formatters'
 import { boardModel } from '~/models/boardModel'
+import { columnModel } from '~/models/columnModel'
+import { cardModel } from '~/models/cardModel'
 import { cloneDeep } from 'lodash'
 import ApiError from '~/utils/ApiError'
 
@@ -47,8 +49,23 @@ const update = async (boardId, reqBody) => {
   } catch (error) { throw error }
 }
 
+const moveCardToDifferentColumn = async (reqBody) => {
+  try {
+    const { cardId, fromColumnId, fromColumnOrderIds, toColumnId, toColumnOrderIds } = reqBody
+    // Update Previous Column
+    await columnModel.update(fromColumnId, { cardOrderIds: fromColumnOrderIds })
+    // Update New Column
+    await columnModel.update(toColumnId, { cardOrderIds: toColumnOrderIds })
+
+    await cardModel.update(cardId, { columnId: toColumnId })
+
+    return { returnResult: 'Card moved successfully' }
+  } catch (error) { throw error }
+}
+
 export const boardService = {
   createNew,
   getDetails,
-  update
+  update,
+  moveCardToDifferentColumn
 }
