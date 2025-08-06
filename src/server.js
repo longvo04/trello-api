@@ -18,9 +18,9 @@ const START_SERVER = () => {
   app.use('/v1', APIs_V1)
   app.use(errorHandlingMiddleware)
   if (env.BUILD_MODE === 'production') {
-    app.listen(process.env.port, () => {
+    app.listen(process.env.PORT, () => {
     // eslint-disable-next-line no-console
-      console.log(`Server is running at port ${ process.env.port }`)
+      console.log(`Server is running at port ${ process.env.PORT }`)
     })
   } else {
     app.listen(port, hostname, () => {
