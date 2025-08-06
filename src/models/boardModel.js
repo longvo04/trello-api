@@ -95,6 +95,27 @@ const pushColumnIdToBoard = async (column) => {
 }
 
 
+const pullColumnIdFromBoard = async (column) => {
+  try {
+    const boardId = column.boardId
+    const columnId = column._id
+
+    if (!boardId || !columnId) {
+      throw new Error('Board ID and Column ID are required')
+    }
+
+    const updateResult = await GET_DB().collection(BOARD_COLLECTION_NAME).findOneAndUpdate(
+      { _id: new ObjectId(String(boardId)) },
+      { $pull: { columnOrderIds: new ObjectId(String(columnId)) } },
+      { returnDocument: 'after' }
+    )
+
+    return updateResult
+  } catch (error) {
+    throw new Error(`Failed to push column ID to board: ${error.message}`)
+  }
+}
+
 const update = async (boardId, updateData) => {
   try {
     // Validate updateData to ensure it does not contain invalid fields
@@ -128,5 +149,6 @@ export const boardModel = {
   findOneById,
   getDetails,
   pushColumnIdToBoard,
+  pullColumnIdFromBoard,
   update
 }

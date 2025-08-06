@@ -4,6 +4,7 @@ import { boardModel } from '~/models/boardModel'
 import { columnModel } from '~/models/columnModel'
 import { cardModel } from '~/models/cardModel'
 import { cloneDeep } from 'lodash'
+import { StatusCodes } from 'http-status-codes'
 import ApiError from '~/utils/ApiError'
 
 const createNew = async (board) => {
@@ -22,7 +23,7 @@ const getDetails = async (boardId) => {
   try {
     const board = await boardModel.getDetails(boardId)
     if (!board) {
-      throw new ApiError(404, 'Board not found')
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Board not found')
     }
     const result = cloneDeep(board)
     result.columns = result.columns.map(column => {
@@ -43,7 +44,7 @@ const update = async (boardId, reqBody) => {
     }
     const updatedBoard = await boardModel.update(boardId, updateData)
     if (!updatedBoard) {
-      throw new ApiError(404, 'Board not found')
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Board not found')
     }
     return updatedBoard
   } catch (error) { throw error }
