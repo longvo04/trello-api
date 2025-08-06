@@ -18,7 +18,8 @@ const createNew = async (req, res, next) => {
   })
 
   try {
-    await schema.validateAsync(req.body, { abortEarly: false })
+    const data = req?.body || {}
+    await schema.validateAsync(data, { abortEarly: false })
     next()
   } catch (error) {
     next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, new Error(error).message))
@@ -33,7 +34,8 @@ const update = async (req, res, next) => {
   })
 
   try {
-    await schema.validateAsync(req.body, { abortEarly: false, allowUnknown: true })
+    const data = req?.body || {}
+    await schema.validateAsync(data, { abortEarly: false, allowUnknown: true })
     next()
   } catch (error) {
     next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, new Error(error).message))
@@ -51,7 +53,8 @@ const moveCardToDifferentColumn = async (req, res, next) => {
   })
 
   try {
-    await schema.validateAsync(req.body, { abortEarly: false })
+    const data = req?.body || {}
+    await schema.validateAsync(data, { abortEarly: false })
     next()
   } catch (error) {
     next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, new Error(error).message))
