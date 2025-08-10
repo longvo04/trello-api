@@ -1,5 +1,7 @@
 // export const WHITELIST_DOMAINS = ['http://localhost:5173']
-export const WHITELIST_DOMAINS = []
+export const WHITELIST_DOMAINS = [
+  'https://trello-web-omega-flame.vercel.app'
+]
 
 export const BOARD_TYPES = {
   PUBLIC: 'public',
