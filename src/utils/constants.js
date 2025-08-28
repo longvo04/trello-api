@@ -7,3 +7,8 @@ export const BOARD_TYPES = {
   PUBLIC: 'public',
   PRIVATE: 'private'
 }
+
+export const USER_ROLES = {
+  ADMIN: 'admin',
+  CLIENT: 'client'
+}

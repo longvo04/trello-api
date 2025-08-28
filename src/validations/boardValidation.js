@@ -14,12 +14,13 @@ const createNew = async (req, res, next) => {
       'string.max': 'Title must not exceed 100 characters'
     }),
     description: Joi.string().required().min(3).max(500).trim().strict(),
-    type: Joi.string().valid(BOARD_TYPES.PUBLIC, BOARD_TYPES.PRIVATE).required()
+    type: Joi.string().valid(BOARD_TYPES.PUBLIC, BOARD_TYPES.PRIVATE).default(BOARD_TYPES.PUBLIC)
   })
 
   try {
     const data = req?.body || {}
-    await schema.validateAsync(data, { abortEarly: false })
+    const validatedData = await schema.validateAsync(data, { abortEarly: false })
+    req.body = validatedData
     next()
   } catch (error) {
     next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, new Error(error).message))
@@ -35,7 +36,8 @@ const update = async (req, res, next) => {
 
   try {
     const data = req?.body || {}
-    await schema.validateAsync(data, { abortEarly: false, allowUnknown: true })
+    const validatedData = await schema.validateAsync(data, { abortEarly: false, allowUnknown: true })
+    req.body = validatedData
     next()
   } catch (error) {
     next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, new Error(error).message))
@@ -54,7 +56,8 @@ const moveCardToDifferentColumn = async (req, res, next) => {
 
   try {
     const data = req?.body || {}
-    await schema.validateAsync(data, { abortEarly: false })
+    const validatedData = await schema.validateAsync(data, { abortEarly: false })
+    req.body = validatedData
     next()
   } catch (error) {
     next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, new Error(error).message))

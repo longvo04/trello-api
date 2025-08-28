@@ -11,7 +11,8 @@ const createNew = async (req, res, next) => {
 
   try {
     const data = req?.body || {}
-    await schema.validateAsync(data, { abortEarly: false })
+    const validatedData = await schema.validateAsync(data, { abortEarly: false })
+    req.body = validatedData
     next()
   } catch (error) {
     next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, new Error(error).message))
@@ -27,7 +28,8 @@ const update = async (req, res, next) => {
 
   try {
     const data = req?.body || {}
-    await schema.validateAsync(data, { abortEarly: false, allowUnknown: true })
+    const validatedData = await schema.validateAsync(data, { abortEarly: false, allowUnknown: true })
+    req.body = validatedData
     next()
   } catch (error) {
     next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, new Error(error).message))
@@ -41,7 +43,8 @@ const deleteColumn = async (req, res, next) => {
 
   try {
     const data = req?.params || {}
-    await schema.validateAsync(data, { abortEarly: false })
+    const validatedParams = await schema.validateAsync(data, { abortEarly: false })
+    req.params = validatedParams
     next()
   } catch (error) {
     next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, new Error(error).message))

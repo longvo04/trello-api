@@ -12,7 +12,8 @@ const createNew = async (req, res, next) => {
 
   try {
     const data = req?.body || {}
-    await schema.validateAsync(data, { abortEarly: false })
+    const validatedData = await schema.validateAsync(data, { abortEarly: false })
+    req.body = validatedData
     next()
   } catch (error) {
     next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, new Error(error).message))
