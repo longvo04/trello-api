@@ -4,7 +4,7 @@ import { userController } from '../../controllers/userController.js'
 
 const Router = express.Router()
 
-Router.route('/')
+Router.route('/register')
   .post(userValidation.createNew, userController.createNew)
 
 export const userRoute = Router
