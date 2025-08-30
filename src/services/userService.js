@@ -5,7 +5,9 @@ import bcryptjs from 'bcryptjs'
 import { v4 as uuidv4 } from 'uuid'
 import { pickUser } from '~/utils/formatters'
 import { WEBSITE_DOMAIN } from '~/utils/constants.js'
-import { ResendProvider } from '~/providers/resendProvider'
+import { ResendProvider } from '~/providers/ResendProvider'
+import { env } from '~/config/environment'
+import { JwtProvider } from '~/providers/JwtProvider'
 
 const createNew = async (reqBody) => {
   const existUser = await userModel.findOneByEmail(reqBody.email)
@@ -39,6 +41,51 @@ const createNew = async (reqBody) => {
   return pickUser(getNewUser)
 }
 
+const verifyAccount = async (reqBody) => {
+  const existUser = await userModel.findOneByEmail(reqBody.email)
+  if (!existUser) throw new ApiError(StatusCodes.NOT_FOUND, 'User not found')
+  if (existUser.isActive) throw new ApiError(StatusCodes.NOT_ACCEPTABLE, 'Account already verified')
+  if (existUser.verifyToken !== reqBody.token) throw new ApiError(StatusCodes.BAD_REQUEST, 'Invalid token')
+
+  const updateData = {
+    isActive: true,
+    verifyToken: null,
+    updatedAt: new Date()
+  }
+
+  const updatedUser = await userModel.update(existUser._id, updateData)
+
+  return pickUser(updatedUser)
+}
+
+const login = async (reqBody) => {
+  const existUser = await userModel.findOneByEmail(reqBody.email)
+  if (!existUser) throw new ApiError(StatusCodes.NOT_FOUND, 'User not found')
+  const isPasswordValid = bcryptjs.compareSync(reqBody.password, existUser.password)
+  if (!isPasswordValid) throw new ApiError(StatusCodes.UNAUTHORIZED, 'Invalid email or password')
+  if (!existUser.isActive) throw new ApiError(StatusCodes.FORBIDDEN, 'Account is not activated. Please verify your email before logging in')
+
+  // Tạo token
+  const userInfo = { _id: existUser._id, email: existUser.email }
+  const accessToken = await JwtProvider.generateToken(
+    userInfo,
+    env.ACCESS_TOKEN_SECRET_SIGNATURE,
+    env.ACCESS_TOKEN_LIFE
+  )
+  const refreshToken = await JwtProvider.generateToken(
+    userInfo,
+    env.REFRESH_TOKEN_SECRET_SIGNATURE,
+    env.REFRESH_TOKEN_LIFE
+  )
+  return {
+    accessToken,
+    refreshToken,
+    ...pickUser(existUser)
+  }
+}
+
 export const userService = {
-  createNew
+  createNew,
+  verifyAccount,
+  login
 }
