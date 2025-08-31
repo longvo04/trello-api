@@ -11,7 +11,7 @@ const isAuthorized = async (req, res, next) => {
   }
   try {
     const accessTokenDecoded = await JwtProvider.verifyToken(accessToken, env.ACCESS_TOKEN_SECRET_SIGNATURE)
-    req.decodedAccessToken = accessTokenDecoded
+    req.jwtDecoded = accessTokenDecoded
     next()
   } catch (error) {
     if (error?.message?.includes('jwt expired')) {
