@@ -7,12 +7,20 @@ import { APIs_V1 } from './routes/v1/index.js'
 import { errorHandlingMiddleware } from './middlewares/errorHandlingMiddleware.js'
 import cors from 'cors'
 import { corsOptions } from './config/cors'
-const app = express()
+import cookieParser from 'cookie-parser'
 
 const hostname = env.APP_HOST
 const port = env.APP_PORT
 
 const START_SERVER = () => {
+  const app = express()
+
+  app.use((req, res, next) => {
+    res.set('Cache-Control', 'no-store')
+    next()
+  })
+
+  app.use(cookieParser())
   app.use(cors(corsOptions))
   app.use(express.json())
   app.use('/v1', APIs_V1)
