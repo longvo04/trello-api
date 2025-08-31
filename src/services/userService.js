@@ -102,9 +102,32 @@ const refreshToken = async (clientRefreshToken) => {
   }
 }
 
+const update = async (userId, reqBody) => {
+  const existUser = await userModel.findOneById(userId)
+  if (!existUser) throw new ApiError(StatusCodes.NOT_FOUND, 'User not found')
+  if (!existUser.isActive) throw new ApiError(StatusCodes.FORBIDDEN, 'Account is not activated. Please verify your email before updating profile')
+
+  let updatedUser = {}
+  if (reqBody.current_password && reqBody.new_password) {
+    const isPasswordValid = bcryptjs.compareSync(reqBody.current_password, existUser.password)
+    if (!isPasswordValid) throw new ApiError(StatusCodes.CONFLICT, 'Invalid current password')
+    updatedUser = await userModel.update(userId, {
+      password: bcryptjs.hashSync(reqBody.new_password, 8),
+      updatedAt: new Date()
+    })
+  } else {
+    updatedUser = await userModel.update(userId, {
+      ...reqBody,
+      updatedAt: new Date()
+    })
+  }
+  return pickUser(updatedUser)
+}
+
 export const userService = {
   createNew,
   verifyAccount,
   login,
-  refreshToken
+  refreshToken,
+  update
 }
