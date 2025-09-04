@@ -74,8 +74,9 @@ const refreshToken = async (req, res, next) => {
 
 const update = async (req, res, next) => {
   const userId = req.jwtDecoded._id
+  const userAvatar = req?.file
   try {
-    const updatedUser = await userService.update(userId, req.body)
+    const updatedUser = await userService.update(userId, req.body, userAvatar)
     res.status(StatusCodes.OK).json(updatedUser)
   } catch (error) {
     next(error)
