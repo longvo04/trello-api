@@ -8,6 +8,7 @@ import { WEBSITE_DOMAIN } from '~/utils/constants.js'
 import { ResendProvider } from '~/providers/ResendProvider'
 import { env } from '~/config/environment'
 import { JwtProvider } from '~/providers/JwtProvider'
+import { CloudinaryProvider } from '~/providers/CloudinaryProvider'
 
 const createNew = async (reqBody) => {
   const existUser = await userModel.findOneByEmail(reqBody.email)
@@ -102,7 +103,7 @@ const refreshToken = async (clientRefreshToken) => {
   }
 }
 
-const update = async (userId, reqBody) => {
+const update = async (userId, reqBody, userAvatar) => {
   const existUser = await userModel.findOneById(userId)
   if (!existUser) throw new ApiError(StatusCodes.NOT_FOUND, 'User not found')
   if (!existUser.isActive) throw new ApiError(StatusCodes.FORBIDDEN, 'Account is not activated. Please verify your email before updating profile')
@@ -113,6 +114,12 @@ const update = async (userId, reqBody) => {
     if (!isPasswordValid) throw new ApiError(StatusCodes.CONFLICT, 'Invalid current password')
     updatedUser = await userModel.update(userId, {
       password: bcryptjs.hashSync(reqBody.new_password, 8),
+      updatedAt: new Date()
+    })
+  } else if (userAvatar) {
+    const uploadResult = await CloudinaryProvider.streamUpload(userAvatar.buffer, 'users')
+    updatedUser = await userModel.update(userId, {
+      avatar: uploadResult.secure_url,
       updatedAt: new Date()
     })
   } else {
