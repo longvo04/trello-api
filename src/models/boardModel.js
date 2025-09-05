@@ -3,14 +3,20 @@ import { ObjectId } from 'mongodb'
 import { GET_DB } from '~/config/mongodb'
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 import { BOARD_TYPES } from '~/utils/constants'
-
+import { pagingSkipValue } from '~/utils/algorithms'
 // Define Collection (name & schema)
 const BOARD_COLLECTION_NAME = 'boards'
 const BOARD_COLLECTION_SCHEMA = Joi.object({
   title: Joi.string().required().min(3).max(50).trim().strict(),
   slug: Joi.string().required().min(3).trim().strict(),
   description: Joi.string().required().min(3).max(256).trim().strict(),
-
+  ownerIds: Joi.array().items(
+    Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)
+  ).min(1).required(),
+  memberIds: Joi.array().items(
+    Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)
+  ).default([]),
+  // public or private
   type: Joi.string().valid(BOARD_TYPES.PUBLIC, BOARD_TYPES.PRIVATE).required(),
 
   columnOrderIds: Joi.array().items(
@@ -142,6 +148,37 @@ const update = async (boardId, updateData) => {
   }
 }
 
+const getBoards = async (userId, page, itemsPerPage) => {
+  try {
+    const queryCondition = [
+      { _destroy: false },
+      { $or: [
+        { ownerIds: { $all: [new ObjectId(String(userId))] } },
+        { memberIds: { $all: [new ObjectId(String(userId))] } }
+      ] }
+    ]
+
+    const query = await GET_DB().collection(BOARD_COLLECTION_NAME).aggregate([
+      { $match: { $and: queryCondition } },
+      { $sort: { title: 1 } },
+      { $facet: {
+        'queryBoards': [
+          { $skip: pagingSkipValue(page, itemsPerPage) },
+          { $limit: itemsPerPage }
+        ],
+        'queryTotalBoards': [{ $count: 'count' }]
+      } }
+    ]).toArray()
+
+    const result = query[0]
+
+    return {
+      boards: result.queryBoards || [],
+      totalBoards: result.queryTotalBoards[0] ? result.queryTotalBoards[0].count : 0
+    }
+  } catch (error) { throw error }
+}
+
 export const boardModel = {
   BOARD_COLLECTION_NAME,
   BOARD_COLLECTION_SCHEMA,
@@ -150,5 +187,6 @@ export const boardModel = {
   getDetails,
   pushColumnIdToBoard,
   pullColumnIdFromBoard,
-  update
+  update,
+  getBoards
 }

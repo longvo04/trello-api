@@ -6,7 +6,7 @@ import { cardModel } from '~/models/cardModel'
 import { cloneDeep } from 'lodash'
 import { StatusCodes } from 'http-status-codes'
 import ApiError from '~/utils/ApiError'
-
+import { DEFAULT_PAGE, DEFAULT_ITEMS_PER_PAGE } from '~/utils/constants'
 const createNew = async (board) => {
   try {
     const newBoard = {
@@ -64,9 +64,20 @@ const moveCardToDifferentColumn = async (reqBody) => {
   } catch (error) { throw error }
 }
 
+const getBoards = async (userId, page, itemsPerPage) => {
+  try {
+    const pageNumber = parseInt(page, 10) || DEFAULT_PAGE
+    const limit = parseInt(itemsPerPage, 10) || DEFAULT_ITEMS_PER_PAGE
+    const result = await boardModel.getBoards(userId, pageNumber, limit)
+
+    return result
+  } catch (error) { throw error }
+}
+
 export const boardService = {
   createNew,
   getDetails,
   update,
-  moveCardToDifferentColumn
+  moveCardToDifferentColumn,
+  getBoards
 }
