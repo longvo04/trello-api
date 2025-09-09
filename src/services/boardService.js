@@ -7,21 +7,22 @@ import { cloneDeep } from 'lodash'
 import { StatusCodes } from 'http-status-codes'
 import ApiError from '~/utils/ApiError'
 import { DEFAULT_PAGE, DEFAULT_ITEMS_PER_PAGE } from '~/utils/constants'
-const createNew = async (board) => {
+
+const createNew = async (userId, board) => {
   try {
     const newBoard = {
       ...board,
       slug: slugify(board.title)
     }
-    const createdBoard = await boardModel.createNew(newBoard)
+    const createdBoard = await boardModel.createNew(userId, newBoard)
     const result = await boardModel.findOneById(createdBoard.insertedId)
     return result
   } catch (error) { throw error }
 }
 
-const getDetails = async (boardId) => {
+const getDetails = async (userId, boardId) => {
   try {
-    const board = await boardModel.getDetails(boardId)
+    const board = await boardModel.getDetails(userId, boardId)
     if (!board) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Board not found')
     }

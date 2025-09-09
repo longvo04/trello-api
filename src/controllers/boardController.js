@@ -4,7 +4,8 @@ import { boardService } from '~/services/boardService'
 
 const createNew = async (req, res, next) => {
   try {
-    const newBoard = await boardService.createNew(req.body)
+    const userId = req.jwtDecoded._id
+    const newBoard = await boardService.createNew(userId, req.body)
 
     res.status(StatusCodes.CREATED).json(newBoard)
   } catch (error) {
@@ -15,7 +16,8 @@ const createNew = async (req, res, next) => {
 const getDetails = async (req, res, next) => {
   try {
     const boardId = req.params.id
-    const newBoard = await boardService.getDetails(boardId)
+    const userId = req.jwtDecoded._id
+    const newBoard = await boardService.getDetails(userId, boardId)
 
     res.status(StatusCodes.CREATED).json(newBoard)
   } catch (error) {
