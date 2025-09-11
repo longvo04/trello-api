@@ -16,9 +16,9 @@ const createNewBoardInvitation = async (reqBody, inviterId) => {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Inviter, Invitee or Board Not Found!')
     }
 
-    if (inviter._id.equals(invitee._id)) {
-      throw new ApiError(StatusCodes.CONFLICT, 'Invalid email address')
-    }
+    // if (inviter._id.equals(invitee._id)) {
+    //   throw new ApiError(StatusCodes.CONFLICT, 'Invalid email address')
+    // }
 
     const newInvitationData = {
       inviterId,
@@ -41,11 +41,24 @@ const createNewBoardInvitation = async (reqBody, inviterId) => {
     }
 
     return resInvitation
-  } catch (error) {
-    throw error
-  }
+  } catch (error) { throw new Error(error) }
+}
+
+const getBoardInvitations = async (userId) => {
+  try {
+    const boardInvitations = await invitationModel.getUserBoardInvitations(userId)
+
+    const resInvitations = boardInvitations.map(invitation => ({
+      ...invitation,
+      inviter: invitation?.inviter[0] || {},
+      board: invitation?.board[0] || {},
+      invitee: invitation?.invitee[0] || {}
+    }))
+    return resInvitations
+  } catch (error) { throw new Error(error) }
 }
 
 export const invitationService = {
-  createNewBoardInvitation
+  createNewBoardInvitation,
+  getBoardInvitations
 }

@@ -3,6 +3,8 @@ import { EMAIL_RULE, EMAIL_RULE_MESSAGE, OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE 
 import { ObjectId } from 'mongodb'
 import { GET_DB } from '~/config/mongodb'
 import { BOARD_INVITATION_STATUS, INVITATION_TYPES } from '~/utils/constants'
+import { boardModel } from './boardModel'
+import { userModel } from './userModel'
 
 // Define Collection (name & schema)
 const INVITATION_COLLECTION_NAME = 'invitations'
@@ -88,10 +90,51 @@ const update = async (invitationId, updateData) => {
   }
 }
 
+const getUserBoardInvitations = async (userId) => {
+  try {
+    const queryCondition = [
+      { inviteeId: new ObjectId(String(userId)) },
+      { _destroy: false }
+    ]
+
+    const boardInvitations = await GET_DB().collection(INVITATION_COLLECTION_NAME).aggregate([
+      { $match: { $and: queryCondition } },
+      {
+        $lookup: {
+          from: userModel.USER_COLLECTION_NAME,
+          localField: 'inviterId',
+          foreignField: '_id',
+          as: 'inviter',
+          pipeline: [{ $project: { 'password': 0, 'verifyToken': 0 } }]
+        }
+      },
+      {
+        $lookup: {
+          from: userModel.USER_COLLECTION_NAME,
+          localField: 'inviteeId',
+          foreignField: '_id',
+          as: 'invitee',
+          pipeline: [{ $project: { 'password': 0, 'verifyToken': 0 } }]
+        }
+      },
+      {
+        $lookup: {
+          from: boardModel.BOARD_COLLECTION_NAME,
+          localField: 'boardInvitation.boardId',
+          foreignField: '_id',
+          as: 'board'
+        }
+      }
+    ]).toArray()
+    return boardInvitations
+  } catch (error) { throw new Error(error)}
+}
+
 export const invitationModel = {
   INVITATION_COLLECTION_NAME,
   INVITATION_COLLECTION_SCHEMA,
   createNewBoardInvitation,
   findOneById,
-  update
+  update,
+  getUserBoardInvitations
 }

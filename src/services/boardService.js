@@ -17,7 +17,7 @@ const createNew = async (userId, board) => {
     const createdBoard = await boardModel.createNew(userId, newBoard)
     const result = await boardModel.findOneById(createdBoard.insertedId)
     return result
-  } catch (error) { throw error }
+  } catch (error) { throw new Error(error) }
 }
 
 const getDetails = async (userId, boardId) => {
@@ -33,7 +33,7 @@ const getDetails = async (userId, boardId) => {
     })
     delete result.cards
     return result
-  } catch (error) { throw error }
+  } catch (error) { throw new Error(error) }
 }
 
 
@@ -48,7 +48,7 @@ const update = async (boardId, reqBody) => {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Board not found')
     }
     return updatedBoard
-  } catch (error) { throw error }
+  } catch (error) { throw new Error(error) }
 }
 
 const moveCardToDifferentColumn = async (reqBody) => {
@@ -62,7 +62,7 @@ const moveCardToDifferentColumn = async (reqBody) => {
     await cardModel.update(cardId, { columnId: toColumnId })
 
     return { returnResult: 'Card moved successfully' }
-  } catch (error) { throw error }
+  } catch (error) { throw new Error(error) }
 }
 
 const getBoards = async (userId, page, itemsPerPage) => {
@@ -72,7 +72,7 @@ const getBoards = async (userId, page, itemsPerPage) => {
     const result = await boardModel.getBoards(userId, pageNumber, limit)
 
     return result
-  } catch (error) { throw error }
+  } catch (error) { throw new Error(error) }
 }
 
 export const boardService = {

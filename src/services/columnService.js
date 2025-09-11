@@ -18,7 +18,7 @@ const createNew = async (column) => {
     }
 
     return getNewColumn
-  } catch (error) { throw error }
+  } catch (error) { throw new Error(error) }
 
 }
 
@@ -33,7 +33,7 @@ const update = async (columnId, reqBody) => {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Column not found')
     }
     return updatedColumn
-  } catch (error) { throw error }
+  } catch (error) { throw new Error(error) }
 }
 
 const deleteColumn = async (columnId) => {
@@ -50,7 +50,7 @@ const deleteColumn = async (columnId) => {
     await boardModel.pullColumnIdFromBoard(column)
 
     return { message: 'Column deleted successfully' }
-  } catch (error) { throw error }
+  } catch (error) { throw new Error(error) }
 }
 
 export const columnService = {
