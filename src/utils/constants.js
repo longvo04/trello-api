@@ -15,6 +15,16 @@ export const USER_ROLES = {
   CLIENT: 'client'
 }
 
+export const INVITATION_TYPES = {
+  BOARD_INVITATION: 'board'
+}
+
+export const BOARD_INVITATION_STATUS = {
+  PENDING: 'pending',
+  ACCEPTED: 'accepted',
+  REJECTED: 'rejected'
+}
+
 export const WEBSITE_DOMAIN = env.BUILD_MODE === 'production' ? env.WEBSITE_DOMAIN_PROD : env.WEBSITE_DOMAIN_DEV
 
 export const DEFAULT_PAGE = 1
