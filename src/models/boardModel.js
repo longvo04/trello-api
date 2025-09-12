@@ -211,6 +211,20 @@ const getBoards = async (userId, page, itemsPerPage) => {
   } catch (error) { throw error }
 }
 
+const pushMemberIds = async (boardId, userId) => {
+  try {
+    const updateResult = await GET_DB().collection(BOARD_COLLECTION_NAME).findOneAndUpdate(
+      { _id: new ObjectId(String(boardId)) },
+      { $push: { memberIds: new ObjectId(String(userId)) } },
+      { returnDocument: 'after' }
+    )
+
+    return updateResult
+  } catch (error) {
+    throw new Error(`Failed to push column ID to board: ${error.message}`)
+  }
+}
+
 export const boardModel = {
   BOARD_COLLECTION_NAME,
   BOARD_COLLECTION_SCHEMA,
@@ -220,5 +234,6 @@ export const boardModel = {
   pushColumnIdToBoard,
   pullColumnIdFromBoard,
   update,
-  getBoards
+  getBoards,
+  pushMemberIds
 }
