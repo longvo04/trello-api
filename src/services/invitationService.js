@@ -39,7 +39,6 @@ const createNewBoardInvitation = async (reqBody, inviterId) => {
       inviter: pickUser(inviter),
       invitee: pickUser(invitee)
     }
-
     return resInvitation
   } catch (error) { throw new Error(error) }
 }
