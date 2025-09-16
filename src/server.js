@@ -9,6 +9,9 @@ import cors from 'cors'
 import { corsOptions } from './config/cors'
 import cookieParser from 'cookie-parser'
 
+import http from 'http'
+import socketIo from 'socket.io'
+
 const hostname = env.APP_HOST
 const port = env.APP_PORT
 
@@ -25,13 +28,24 @@ const START_SERVER = () => {
   app.use(express.json())
   app.use('/v1', APIs_V1)
   app.use(errorHandlingMiddleware)
+
+  const server = http.createServer(app)
+  const io = new socketIo.Server(server, { cors: corsOptions })
+
+  io.on('connection', (socket) => {
+    console.log('connected')
+    socket.on('FE_INVITATION_SENT_TO_USER', (invitation) => {
+      socket.broadcast.emit('BE_INVITATION_SENT_TO_USER', invitation)
+    })
+  })
+
   if (env.BUILD_MODE === 'production') {
-    app.listen(process.env.PORT, () => {
+    server.listen(process.env.PORT, () => {
     // eslint-disable-next-line no-console
       console.log(`Server is running at port ${ process.env.PORT }`)
     })
   } else {
-    app.listen(port, hostname, () => {
+    server.listen(port, hostname, () => {
     // eslint-disable-next-line no-console
       console.log(`Server is running at http://${ hostname }:${ port }/`)
     })
