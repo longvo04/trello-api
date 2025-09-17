@@ -1,5 +1,5 @@
 import Joi from 'joi'
-import { EMAIL_RULE, EMAIL_RULE_MESSAGE, OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
+import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 import { ObjectId } from 'mongodb'
 import { GET_DB } from '~/config/mongodb'
 import { BOARD_INVITATION_STATUS, INVITATION_TYPES } from '~/utils/constants'
@@ -15,7 +15,7 @@ const INVITATION_COLLECTION_SCHEMA = Joi.object({
 
   boardInvitation: Joi.object({
     boardId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
-    status: Joi.string().required().valid(...Object.values(BOARD_INVITATION_STATUS)),
+    status: Joi.string().required().valid(...Object.values(BOARD_INVITATION_STATUS))
   }).optional(),
 
   createdAt: Joi.date().timestamp('javascript').default(Date.now),

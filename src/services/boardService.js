@@ -65,11 +65,11 @@ const moveCardToDifferentColumn = async (reqBody) => {
   } catch (error) { throw new Error(error) }
 }
 
-const getBoards = async (userId, page, itemsPerPage) => {
+const getBoards = async (userId, page, itemsPerPage, queryFilters) => {
   try {
     const pageNumber = parseInt(page, 10) || DEFAULT_PAGE
     const limit = parseInt(itemsPerPage, 10) || DEFAULT_ITEMS_PER_PAGE
-    const result = await boardModel.getBoards(userId, pageNumber, limit)
+    const result = await boardModel.getBoards(userId, pageNumber, limit, queryFilters)
 
     return result
   } catch (error) { throw new Error(error) }

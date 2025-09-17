@@ -11,6 +11,7 @@ import cookieParser from 'cookie-parser'
 
 import http from 'http'
 import socketIo from 'socket.io'
+import { boardInvitationSocket } from './sockets/notificationSocket'
 
 const hostname = env.APP_HOST
 const port = env.APP_PORT
@@ -33,10 +34,7 @@ const START_SERVER = () => {
   const io = new socketIo.Server(server, { cors: corsOptions })
 
   io.on('connection', (socket) => {
-    console.log('connected')
-    socket.on('FE_INVITATION_SENT_TO_USER', (invitation) => {
-      socket.broadcast.emit('BE_INVITATION_SENT_TO_USER', invitation)
-    })
+    boardInvitationSocket(socket)
   })
 
   if (env.BUILD_MODE === 'production') {
