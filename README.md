@@ -1,18 +1,40 @@
-```
-* nodejs >= 18.16.0
-* npm = v9.8.1
-* yarn = v1.22.19
+# Trello API
 
-* "express": "^4.18.2"
-* "nodemon": "^3.0.1"
-* "eslint": "^8.47.0"
+A Node.js/Express backend for a Trello-like project management application.
 
-* "@babel/runtime": "^7.22.10"
-* "@babel/cli": "^7.22.10"
-* "@babel/core": "^7.22.10"
-* "@babel/eslint-parser": "^7.22.10"
-* "@babel/node": "^7.22.10"
-* "@babel/plugin-transform-runtime": "^7.22.10"
-* "@babel/preset-env": "^7.22.10"
-* "babel-plugin-module-resolver": "^5.0.0"
-```
+## Features
+
+- RESTful API for boards, lists, and cards
+- User authentication with JWT
+- CRUD operations for boards, lists, cards
+- MongoDB database integration
+- CORS support for frontend
+- Input validation and error handling
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js >= 22.13.0
+
+### Installation
+
+1. Clone the repository:
+   ```
+   git clone https://github.com/longvo04/trello-api.git
+   cd trello-api
+   ```
+
+2. Install dependencies:
+   ```
+   npm install
+   ```
+
+3. Create a `.env` file in the root directory:
+
+4. Start the server:
+   ```
+   npm run dev
+   ```
+   The API will run at [http://localhost:8017](http://localhost:8017).
+
